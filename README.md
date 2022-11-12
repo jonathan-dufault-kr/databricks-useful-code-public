@@ -1,2 +1,3 @@
-# databricks-useful-code-public
-useful notebook snippets/code for me
+# Overview
+
+This is a collection of notebooks containing code that I come back from time to time to use in my scripts. 

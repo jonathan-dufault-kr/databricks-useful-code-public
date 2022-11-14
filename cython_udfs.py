@@ -43,6 +43,16 @@
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC 
+# MAGIC There are a couple ways to register the udf. this one first puts the file in dbfs and registers it to the cython udf. the second method just puts the file from the local node into the spark context.
+# MAGIC 
+# MAGIC I believe the second should always work since I believe our notebook will always be running on the master. 
+
+# COMMAND ----------
+
+# method 1
+
 from shutil import copy as shutil_copy
 from inspect import getmodule
 
@@ -60,28 +70,22 @@ shutil_copy(udf_module_file,dbfs_file_location)
 sc.addFile(f"dbfs:/{udf_module_storage_folder}/{udf_module_file_name}.so")
 
 # register the udf
-spark.udf.register("my_udf",udf_function)
+spark.udf.register("my_udf_method_1",udf_function)
 
+# COMMAND ----------
+
+#method 2
+from inspect import getmodule
+
+sc.addFile(getmodule(fib_mapper_cython).__file__)
+spark.udf.register("my_udf_method_2",fib_mapper_cython)
 
 # COMMAND ----------
 
 # MAGIC %sql
 # MAGIC -- example that shows how to use the new udf
-# MAGIC select my_udf(100) as fibonacci_number 
+# MAGIC select my_udf_method_1(100) as method_1 ,my_udf_method_2(100) as method_2
 
 # COMMAND ----------
 
-# MAGIC %sql
-# MAGIC select
-# MAGIC   my_udf(integer_field) as field_name
-# MAGIC from
-# MAGIC   schema_name.table_name
 
-# COMMAND ----------
-
-from module_name import function_name
-
-file_name_in_dbfs = "dbfs:/path_to_file/module_name.so"
-sc.addFile(file_name_in_dbfs)
-
-spark.udf.register("my_udf",function_name)

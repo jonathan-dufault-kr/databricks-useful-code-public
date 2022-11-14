@@ -71,4 +71,17 @@ spark.udf.register("my_udf",udf_function)
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC select
+# MAGIC   my_udf(integer_field) as field_name
+# MAGIC from
+# MAGIC   schema_name.table_name
 
+# COMMAND ----------
+
+from module_name import function_name
+
+file_name_in_dbfs = "dbfs:/path_to_file/module_name.so"
+sc.addFile(file_name_in_dbfs)
+
+spark.udf.register("my_udf",function_name)

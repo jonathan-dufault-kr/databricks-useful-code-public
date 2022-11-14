@@ -31,3 +31,7 @@ def set_environment_variables(*args,**kwargs):
 @set_environment_variables(http_proxy="http://proxy...")
 def my_func():
   #my_func_code
+
+# COMMAND ----------
+
+my_func()

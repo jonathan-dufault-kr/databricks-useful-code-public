@@ -9,8 +9,8 @@ from requests import get
 from requests import post
 
 # parameters you can find within the url above
-api_base = "https://adb[redacted].net/api/2.0"
-databricks_service = "redacted" # the numbers from the o=redacted part of the url
+api_base = f"https://{spark.conf.get('spark.databricks.workspaceUrl')}/api/2.0"
+databricks_service = spark.conf.get('spark.databricks.clusterUsageTags.clusterOwnerOrgId') # the numbers from the o=redacted part of the url
 databricks_token = dbutils.secrets.get("secret_store_name","your_developer_token_name")
 
 # what bucket to store the secretw in
@@ -50,7 +50,7 @@ data = {
 
 # create urls for checking if scope exists
 # or to create
-get_scopes_url = f"{api_base}/secrets/scopes/list?o=databricks_service"
+get_scopes_url = f"{api_base}/secrets/scopes/list?o={databricks_service}"
 
 get_scopes_response = get(get_scopes_url,headers=headers_for_listing_scopes)
 
@@ -61,8 +61,8 @@ scopes = [existing_scope["name"] for existing_scope in list_of_scopes]
 # either add new scope or replace
 # not strictly necessary since the create request will work either way
 if scope not in scopes:
-  post_url = f"{api_base}/api/2.0/secrets/scope/create?o={databricks_service}"
-  scope_creation_request = post(post_url,headers=headers_for_creating_scope,data=data)
+  post_url = f"{api_base}/secrets/scopes/create?o={databricks_service}"
+  scope_creation_request = post(post_url,headers=headers_for_creating_scope,json=data)
 else:
   print(f"Scope {scope} already exists!")
 
@@ -74,7 +74,6 @@ else:
 # MAGIC ## Create Secrets
 
 # COMMAND ----------
-
 
 # create headers
 headers = {
@@ -131,3 +130,7 @@ print(f"does the value for {sample_key} == 1? {sample_key_value=='1'}")
 # COMMAND ----------
 
 dbutils.secrets.help()
+
+# COMMAND ----------
+
+
